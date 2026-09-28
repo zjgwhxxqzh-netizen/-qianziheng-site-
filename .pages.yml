@@ -1,0 +1,86 @@
+media:
+  input: media
+  output: /media
+  rename: safe
+  categories: [image, document]
+content:
+  - name: photos
+    label: 摄影作品
+    type: collection
+    path: content/photos
+    format: json
+    filename: "{primary}.json"
+    view:
+      primary: title
+      fields: [title, category]
+    fields:
+      - name: title
+        label: 作品名称
+        type: string
+        required: true
+      - name: category
+        label: 分类
+        type: select
+        options:
+          values: [人物肖像, 校园纪实, 城市观察, 商业拍摄, 影像日记]
+      - name: image
+        label: 上传照片
+        type: image
+        required: true
+      - name: description
+        label: 拍摄说明
+        type: text
+  - name: courses
+    label: 课程教学
+    type: collection
+    path: content/courses
+    format: json
+    filename: "{primary}.json"
+    fields:
+      - name: title
+        label: 课程名称
+        type: string
+        required: true
+      - name: description
+        label: 课程简介
+        type: text
+      - name: tag
+        label: 课程标签
+        type: string
+      - name: link
+        label: 课程资料链接（可留空）
+        type: string
+  - name: research
+    label: 学术成果
+    type: collection
+    path: content/research
+    format: json
+    filename: "{primary}.json"
+    fields:
+      - name: title
+        label: 成果名称
+        type: string
+        required: true
+      - name: category
+        label: 成果类别
+        type: string
+      - name: description
+        label: 简介
+        type: text
+      - name: link
+        label: 论文或项目链接（可留空）
+        type: string
+  - name: site
+    label: 首页与简介
+    type: file
+    path: content/site.json
+    format: json
+    operations:
+      delete: false
+    fields:
+      - name: intro
+        label: 首页简介
+        type: text
+      - name: about
+        label: 关于我
+        type: text
