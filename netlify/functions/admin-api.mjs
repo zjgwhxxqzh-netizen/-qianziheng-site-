@@ -186,7 +186,10 @@ const uploadMedia = async ({ filename, mimeType, contentBase64 }) => {
 
 export default async (request) => {
   try {
-    const action = new URL(request.url).pathname.split("/").filter(Boolean).pop() || "status";
+    const requestUrl = new URL(request.url);
+    const action = requestUrl.searchParams.get("action")
+      || requestUrl.pathname.split("/").filter(Boolean).pop()
+      || "status";
     if (request.method !== "GET" && !sameOrigin(request)) return json({ error: "请求来源不正确" }, 403);
 
     if (action === "login" && request.method === "POST") {
