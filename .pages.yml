@@ -2,8 +2,805 @@ media:
   input: media
   output: /media
   rename: safe
-  categories: [image, document]
+  categories: [image, video, document]
+
 content:
+  - name: site
+    label: 网站全局与页面布局
+    type: file
+    path: content/site.json
+    format: json
+    operations:
+      delete: false
+    fields:
+      - name: identity
+        label: 姓名、邮箱与个人标签
+        type: object
+        fields:
+          - name: name_zh
+            label: 中文姓名
+            type: string
+            required: true
+          - name: name_en
+            label: 英文姓名
+            type: string
+            required: true
+          - name: logo_text
+            label: 左上角圆形标识文字
+            type: string
+            description: 建议填写 2—4 个英文字母，例如 QZH。
+          - name: email
+            label: 联系邮箱
+            type: string
+            description: 留空则网页不显示邮箱。
+          - name: location
+            label: 所在地
+            type: string
+          - name: specialties
+            label: 首屏个人标签
+            type: string
+            list:
+              min: 1
+              max: 8
+      - name: seo
+        label: 浏览器标题与搜索摘要
+        type: object
+        fields:
+          - name: title
+            label: 网站标题
+            type: string
+          - name: description
+            label: 网站摘要
+            type: text
+          - name: share_image
+            label: 社交分享封面图
+            type: image
+            description: 分享网站到微信或其他平台时使用的横版封面；可以留空。
+      - name: appearance
+        label: 全站视觉设置
+        type: object
+        fields:
+          - name: accent
+            label: 强调色
+            type: select
+            options:
+              values:
+                - name: electric-blue
+                  label: 电光蓝
+                - name: storm-orange
+                  label: 飓风橙
+                - name: forest
+                  label: 森林绿
+                - name: violet
+                  label: 视觉紫
+          - name: corners
+            label: 卡片圆角
+            type: select
+            options:
+              values:
+                - name: sharp
+                  label: 直角利落
+                - name: subtle
+                  label: 轻微圆角
+                - name: soft
+                  label: 柔和大圆角
+          - name: spacing
+            label: 页面留白密度
+            type: select
+            options:
+              values:
+                - name: compact
+                  label: 紧凑
+                - name: balanced
+                  label: 均衡
+                - name: airy
+                  label: 大留白
+          - name: width
+            label: 页面内容宽度
+            type: select
+            options:
+              values:
+                - name: studio
+                  label: 精致窄版（1240px）
+                - name: wide
+                  label: 宽版画廊（1440px）
+                - name: cinema
+                  label: 电影宽屏（1680px）
+          - name: header_style
+            label: 顶部导航样式
+            type: select
+            options:
+              values:
+                - name: glass
+                  label: 透明磨砂
+                - name: solid
+                  label: 纯白实色
+          - name: motion
+            label: 开启滚动动效
+            type: boolean
+      - name: ui_labels
+        label: 界面小文字
+        type: object
+        description: 修改菜单、筛选按钮、图片占位和“即将上线”等细节文字。
+        fields:
+          - name: menu
+            label: 手机菜单文字
+            type: string
+          - name: scroll
+            label: 首屏向下浏览提示
+            type: string
+          - name: filter_all
+            label: 摄影分类“全部”文字
+            type: string
+          - name: image_slot
+            label: 空照片英文提示
+            type: string
+          - name: image_placeholder
+            label: 空照片中文提示
+            type: string
+          - name: coming_soon
+            label: 暂无链接时的提示
+            type: string
+      - name: socials
+        label: 社交平台链接
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{label}"
+        fields:
+          - name: label
+            label: 平台名称
+            type: string
+          - name: url
+            label: 完整链接
+            type: string
+            description: 必须以 https:// 开头；留空则不显示。
+      - name: footer
+        label: 页脚
+        type: object
+        fields:
+          - name: tagline
+            label: 页脚短句
+            type: string
+          - name: copyright
+            label: 版权署名
+            type: string
+      - name: sections
+        label: 页面板块（可拖动调整顺序）
+        type: block
+        list:
+          min: 1
+          max: 16
+          collapsible:
+            collapsed: true
+            summary: "{heading}"
+        blockKey: type
+        blocks:
+          - name: hero
+            label: 首屏主视觉
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: kicker
+                label: 标题上方英文小字
+                type: string
+              - name: heading
+                label: 首屏大标题
+                type: text
+                required: true
+                description: 可以换行，建议控制在两行。
+              - name: description
+                label: 首屏简介
+                type: text
+              - name: primary_label
+                label: 主按钮文字
+                type: string
+              - name: primary_target
+                label: 主按钮目标
+                type: string
+                description: 页面内位置可填 #photography，也可以填 https:// 开头的网址。
+              - name: secondary_label
+                label: 次按钮文字
+                type: string
+              - name: secondary_target
+                label: 次按钮目标
+                type: string
+              - name: image
+                label: 首屏照片
+                type: image
+                description: 推荐横竖比例接近 4:5，未上传时显示抽象占位视觉。
+              - name: image_alt
+                label: 图片说明（无障碍文字）
+                type: string
+              - name: image_position
+                label: 图片焦点位置
+                type: select
+                options:
+                  values:
+                    - name: center
+                      label: 居中
+                    - name: top
+                      label: 靠上
+                    - name: bottom
+                      label: 靠下
+                    - name: left
+                      label: 靠左
+                    - name: right
+                      label: 靠右
+              - name: media_type
+                label: 首屏使用照片还是视频
+                type: select
+                options:
+                  values:
+                    - name: image
+                      label: 照片
+                    - name: video
+                      label: 视频
+              - name: video_file
+                label: 上传首屏视频
+                type: file
+                description: 建议 MP4 或 WebM；视频较大时更推荐填写下方外部链接。
+                options:
+                  categories: [video]
+                  extensions: [mp4, webm, ogv, mov]
+              - name: video_url
+                label: 首屏视频外部链接
+                type: string
+                description: 支持 https 开头的 MP4/WebM、YouTube 或哔哩哔哩视频链接。
+              - name: poster
+                label: 视频封面图
+                type: image
+              - name: autoplay
+                label: 视频自动播放
+                type: boolean
+              - name: muted
+                label: 视频默认静音
+                type: boolean
+                description: 浏览器通常要求自动播放的视频必须静音。
+              - name: loop
+                label: 视频循环播放
+                type: boolean
+              - name: controls
+                label: 显示视频播放控件
+                type: boolean
+              - name: visual_note
+                label: 图片下方小字
+                type: string
+              - name: layout
+                label: 首屏版式
+                type: select
+                description: split=左右图文；full=全屏影像；minimal=纯文字。
+                options:
+                  values:
+                    - name: split
+                      label: 左右图文
+                    - name: full
+                      label: 全屏影像
+                    - name: minimal
+                      label: 极简纯文字
+          - name: marquee
+            label: 滚动关键词条
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: items
+                label: 滚动关键词
+                type: string
+                list:
+                  min: 2
+                  max: 12
+          - name: photography
+            label: 摄影作品板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 板块介绍
+                type: text
+              - name: layout
+                label: 照片整体排版
+                type: select
+                description: editorial=杂志网格；masonry=瀑布流；cinema=逐张宽银幕。
+                options:
+                  values:
+                    - name: editorial
+                      label: 杂志式网格
+                    - name: masonry
+                      label: 瀑布流
+                    - name: cinema
+                      label: 宽银幕长卷
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+              - name: limit
+                label: 最多显示几张照片
+                type: number
+                options:
+                  min: 1
+                  max: 30
+              - name: link_label
+                label: 更多作品按钮文字
+                type: string
+              - name: link_url
+                label: 更多作品链接
+                type: string
+          - name: video
+            label: 视频作品板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: anchor
+                label: 页面锚点英文名
+                type: string
+                description: 建议使用 video；只能填写小写英文字母、数字和连字符。
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 板块介绍
+                type: text
+              - name: layout
+                label: 视频排版
+                type: select
+                options:
+                  values:
+                    - name: featured
+                      label: 首条视频突出
+                    - name: grid
+                      label: 双列视频网格
+                    - name: filmstrip
+                      label: 单列电影长卷
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+              - name: limit
+                label: 最多显示几个视频
+                type: number
+                options:
+                  min: 1
+                  max: 20
+              - name: link_label
+                label: 更多视频按钮文字
+                type: string
+              - name: link_url
+                label: 更多视频链接
+                type: string
+          - name: stats
+            label: 数据亮点板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 板块介绍
+                type: text
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+              - name: items
+                label: 数据卡片
+                type: object
+                list:
+                  min: 1
+                  max: 4
+                  collapsible:
+                    collapsed: true
+                    summary: "{value} · {label}"
+                fields:
+                  - name: value
+                    label: 大数字或短词
+                    type: string
+                  - name: label
+                    label: 数据名称
+                    type: string
+                  - name: note
+                    label: 补充说明
+                    type: string
+          - name: teaching
+            label: 课程教学板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 板块介绍
+                type: text
+              - name: layout
+                label: 课程排版
+                type: select
+                description: spotlight=首门课程突出；cards=等宽卡片；compact=横向列表。
+                options:
+                  values:
+                    - name: spotlight
+                      label: 首门课程突出
+                    - name: cards
+                      label: 等宽卡片
+                    - name: compact
+                      label: 紧凑横向列表
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+              - name: limit
+                label: 最多显示几门课程
+                type: number
+                options:
+                  min: 1
+                  max: 20
+          - name: research
+            label: 学术研究板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 板块介绍
+                type: text
+              - name: layout
+                label: 学术成果排版
+                type: select
+                options:
+                  values:
+                    - name: timeline
+                      label: 年份时间轴
+                    - name: grid
+                      label: 双列卡片
+                    - name: list
+                      label: 简洁列表
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+              - name: limit
+                label: 最多显示几项成果
+                type: number
+                options:
+                  min: 1
+                  max: 30
+          - name: python
+            label: Python 项目板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 板块介绍
+                type: text
+              - name: layout
+                label: 项目排版
+                type: select
+                options:
+                  values:
+                    - name: lab
+                      label: 实验室主项目突出
+                    - name: cards
+                      label: 等宽卡片
+                    - name: compact
+                      label: 单列紧凑
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+              - name: limit
+                label: 最多显示几个项目
+                type: number
+                options:
+                  min: 1
+                  max: 20
+          - name: story
+            label: 自由图文 / 视频介绍板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: anchor
+                label: 页面锚点英文名
+                type: string
+                description: 如果添加多个介绍板块，每个锚点必须不同，例如 story、teaching-story。
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 醒目简介
+                type: text
+              - name: body
+                label: 详细正文
+                type: text
+              - name: quote
+                label: 强调引语
+                type: text
+              - name: media_type
+                label: 配图类型
+                type: select
+                options:
+                  values:
+                    - name: image
+                      label: 图片
+                    - name: video
+                      label: 视频
+                    - name: none
+                      label: 不使用媒体
+              - name: image
+                label: 上传配图
+                type: image
+              - name: image_alt
+                label: 图片说明（无障碍文字）
+                type: string
+              - name: image_position
+                label: 图片焦点位置
+                type: select
+                options:
+                  values:
+                    - name: center
+                      label: 居中
+                    - name: top
+                      label: 靠上
+                    - name: bottom
+                      label: 靠下
+                    - name: left
+                      label: 靠左
+                    - name: right
+                      label: 靠右
+              - name: video_file
+                label: 上传视频
+                type: file
+                options:
+                  categories: [video]
+                  extensions: [mp4, webm, ogv, mov]
+              - name: video_url
+                label: 视频外部链接
+                type: string
+                description: 支持 https 开头的 MP4/WebM、YouTube 或哔哩哔哩链接。
+              - name: poster
+                label: 视频封面图
+                type: image
+              - name: autoplay
+                label: 视频自动播放
+                type: boolean
+              - name: muted
+                label: 视频默认静音
+                type: boolean
+              - name: loop
+                label: 视频循环播放
+                type: boolean
+              - name: controls
+                label: 显示视频播放控件
+                type: boolean
+              - name: layout
+                label: 图文排版
+                type: select
+                options:
+                  values:
+                    - name: media-left
+                      label: 图片 / 视频在左
+                    - name: media-right
+                      label: 图片 / 视频在右
+                    - name: full
+                      label: 上方宽幅媒体
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+              - name: primary_label
+                label: 主按钮文字
+                type: string
+              - name: primary_target
+                label: 主按钮链接
+                type: string
+              - name: secondary_label
+                label: 次按钮文字
+                type: string
+              - name: secondary_target
+                label: 次按钮链接
+                type: string
+          - name: about
+            label: 关于我板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 板块介绍
+                type: text
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+              - name: image
+                label: 个人照片
+                type: image
+              - name: image_alt
+                label: 图片说明（无障碍文字）
+                type: string
+              - name: quote
+                label: 个人主张大字
+                type: text
+              - name: body
+                label: 个人介绍正文
+                type: text
+              - name: facts
+                label: 个人信息条目
+                type: object
+                list:
+                  collapsible:
+                    collapsed: true
+                    summary: "{label}"
+                fields:
+                  - name: label
+                    label: 左侧名称
+                    type: string
+                  - name: value
+                    label: 右侧内容
+                    type: string
+          - name: contact
+            label: 联系我板块
+            fields:
+              - name: visible
+                label: 显示本板块
+                type: boolean
+              - name: show_in_nav
+                label: 显示在顶部导航
+                type: boolean
+              - name: nav_label
+                label: 导航文字
+                type: string
+              - name: number
+                label: 板块编号
+                type: string
+              - name: eyebrow
+                label: 英文小标题
+                type: string
+              - name: heading
+                label: 中文大标题
+                type: text
+              - name: description
+                label: 联系说明
+                type: text
+              - name: tone
+                label: 板块底色
+                type: select
+                options:
+                  values: [white, mist, ink]
+
   - name: photos
     label: 摄影作品
     type: collection
@@ -12,7 +809,11 @@ content:
     filename: "{primary}.json"
     view:
       primary: title
-      fields: [title, category]
+      fields: [title, category, year, size, visible]
+      sort: [order, year]
+      default:
+        sort: order
+        order: asc
     fields:
       - name: title
         label: 作品名称
@@ -22,40 +823,218 @@ content:
         label: 分类
         type: select
         options:
-          values: [人物肖像, 校园纪实, 城市观察, 商业拍摄, 影像日记]
+          values: [人物肖像, 校园纪实, 城市观察, 商业拍摄, 影像日记, 其他]
+      - name: year
+        label: 拍摄年份
+        type: string
       - name: image
         label: 上传照片
         type: image
-        required: true
+        description: 建议使用 JPG 或 WebP，单张尽量不超过 2 MB。
+      - name: alt
+        label: 图片说明（无障碍文字）
+        type: string
       - name: description
         label: 拍摄说明
         type: text
+      - name: location
+        label: 拍摄地点
+        type: string
+      - name: credit
+        label: 模特 / 客户 / 摄影署名
+        type: string
+      - name: link
+        label: 点击照片跳转链接
+        type: string
+        description: 必须以 https:// 开头；留空则照片不可点击。
+      - name: link_label
+        label: 照片链接无障碍说明
+        type: string
+        description: 例如“查看这组完整作品”。
+      - name: size
+        label: 单张照片占位大小
+        type: select
+        description: feature=主视觉；wide=横幅；tall=竖图；standard=标准。
+        options:
+          values:
+            - name: feature
+              label: 主视觉大图
+            - name: wide
+              label: 横幅
+            - name: tall
+              label: 竖图
+            - name: standard
+              label: 标准图
+      - name: image_position
+        label: 图片焦点位置
+        type: select
+        options:
+          values:
+            - name: center
+              label: 居中
+            - name: top
+              label: 靠上
+            - name: bottom
+              label: 靠下
+            - name: left
+              label: 靠左
+            - name: right
+              label: 靠右
+      - name: order
+        label: 排序数字
+        type: number
+        description: 数字越小越靠前。
+      - name: visible
+        label: 在网页显示
+        type: boolean
+
+  - name: videos
+    label: 视频作品
+    type: collection
+    path: content/videos
+    format: json
+    filename: "{primary}.json"
+    view:
+      primary: title
+      fields: [title, category, year, duration, size, visible]
+      sort: [order, year]
+      default:
+        sort: order
+        order: asc
+    fields:
+      - name: title
+        label: 视频名称
+        type: string
+        required: true
+      - name: category
+        label: 视频分类
+        type: string
+      - name: year
+        label: 发布年份
+        type: string
+      - name: duration
+        label: 视频时长
+        type: string
+        description: 例如 01:30 或 12 分钟。
+      - name: description
+        label: 视频介绍
+        type: text
+      - name: video_file
+        label: 上传视频文件
+        type: file
+        description: 建议使用 MP4 或 WebM；大文件建议使用外部视频平台链接。
+        options:
+          categories: [video]
+          extensions: [mp4, webm, ogv, mov]
+      - name: video_url
+        label: 外部视频链接
+        type: string
+        description: 支持 https 开头的 MP4/WebM、YouTube 或哔哩哔哩链接；与上传文件二选一。
+      - name: poster
+        label: 视频封面图
+        type: image
+      - name: autoplay
+        label: 自动播放
+        type: boolean
+      - name: muted
+        label: 默认静音
+        type: boolean
+      - name: loop
+        label: 循环播放
+        type: boolean
+      - name: controls
+        label: 显示播放控件
+        type: boolean
+      - name: size
+        label: 视频卡片大小
+        type: select
+        options:
+          values:
+            - name: feature
+              label: 主视觉大卡片
+            - name: wide
+              label: 宽卡片
+            - name: standard
+              label: 标准卡片
+      - name: link
+        label: 延伸阅读或完整视频链接
+        type: string
+      - name: link_label
+        label: 链接按钮文字
+        type: string
+      - name: order
+        label: 排序数字
+        type: number
+        description: 数字越小越靠前。
+      - name: visible
+        label: 在网页显示
+        type: boolean
+
   - name: courses
     label: 课程教学
     type: collection
     path: content/courses
     format: json
     filename: "{primary}.json"
+    view:
+      primary: title
+      fields: [title, label, status, order, visible]
+      sort: [order]
+      default:
+        sort: order
+        order: asc
     fields:
       - name: title
         label: 课程名称
         type: string
         required: true
+      - name: label
+        label: 英文编号
+        type: string
+      - name: status
+        label: 学时或课程性质
+        type: string
       - name: description
         label: 课程简介
         type: text
-      - name: tag
+      - name: tags
         label: 课程标签
         type: string
-      - name: link
-        label: 课程资料链接（可留空）
+        list:
+          max: 6
+      - name: cover_image
+        label: 课程封面图
+        type: image
+      - name: cover_alt
+        label: 封面图说明
         type: string
+      - name: link
+        label: 课程资料链接
+        type: string
+        description: 必须以 https:// 开头；可以留空。
+      - name: link_label
+        label: 链接按钮文字
+        type: string
+      - name: order
+        label: 排序数字
+        type: number
+      - name: visible
+        label: 在网页显示
+        type: boolean
+
   - name: research
     label: 学术成果
     type: collection
     path: content/research
     format: json
     filename: "{primary}.json"
+    view:
+      primary: title
+      fields: [title, category, year, order, visible]
+      sort: [order, year]
+      default:
+        sort: order
+        order: asc
     fields:
       - name: title
         label: 成果名称
@@ -64,23 +1043,102 @@ content:
       - name: category
         label: 成果类别
         type: string
+      - name: year
+        label: 年份
+        type: string
+      - name: publication
+        label: 期刊、会议或项目说明
+        type: string
       - name: description
-        label: 简介
+        label: 成果简介
         type: text
       - name: link
-        label: 论文或项目链接（可留空）
+        label: 论文或项目链接
         type: string
-  - name: site
-    label: 首页与简介
-    type: file
-    path: content/site.json
+      - name: link_label
+        label: 链接按钮文字
+        type: string
+      - name: order
+        label: 排序数字
+        type: number
+      - name: visible
+        label: 在网页显示
+        type: boolean
+
+  - name: apps
+    label: Python 小程序
+    type: collection
+    path: content/apps
     format: json
-    operations:
-      delete: false
+    filename: "{primary}.json"
+    view:
+      primary: title
+      fields: [title, app_type, order, visible]
+      sort: [order]
+      default:
+        sort: order
+        order: asc
     fields:
-      - name: intro
-        label: 首页简介
+      - name: title
+        label: 项目名称
+        type: string
+        required: true
+      - name: label
+        label: 项目上方英文编号
+        type: string
+      - name: app_type
+        label: 项目类型
+        type: select
+        description: calculator 会显示内置 IPO 计算器；project 显示普通项目卡片。
+        options:
+          values:
+            - name: project
+              label: 普通项目卡片
+            - name: calculator
+              label: 内置 IPO 计算器
+      - name: symbol
+        label: 卡片圆形标识
+        type: string
+        description: 建议使用 1—3 个字符，例如 PY、IS、%。
+      - name: description
+        label: 项目简介
         type: text
-      - name: about
-        label: 关于我
-        type: text
+      - name: tags
+        label: 技术标签
+        type: string
+        list:
+          max: 6
+      - name: input_one_label
+        label: 计算器第一个输入框文字
+        type: string
+      - name: input_two_label
+        label: 计算器第二个输入框文字
+        type: string
+      - name: action_label
+        label: 计算器按钮文字
+        type: string
+      - name: result_label
+        label: 计算器结果名称
+        type: string
+      - name: link
+        label: 项目链接
+        type: string
+      - name: link_label
+        label: 链接按钮文字
+        type: string
+      - name: order
+        label: 排序数字
+        type: number
+      - name: visible
+        label: 在网页显示
+        type: boolean
+
+settings:
+  content:
+    merge: true
+  commit:
+    templates:
+      create: "新增 {path}（Pages CMS）"
+      update: "更新 {path}（Pages CMS）"
+      delete: "删除 {path}（Pages CMS）"
+      rename: "重命名 {oldPath} 为 {newPath}（Pages CMS）"

@@ -1,7 +1,7 @@
 """Build Henry Qian's editable portfolio with Python's standard library only."""
 from pathlib import Path
 from html import escape
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 import json
 import re
 import shutil
@@ -21,10 +21,12 @@ SECTION_IDS = {
     "hero": "home",
     "marquee": "marquee",
     "photography": "photography",
+    "video": "video",
     "stats": "highlights",
     "teaching": "teaching",
     "research": "research",
     "python": "python",
+    "story": "story",
     "about": "about",
     "contact": "contact",
 }
@@ -71,11 +73,98 @@ def safe_url(value, anchors=True, email=False):
 
 
 def safe_media(value):
-    """Allow Pages CMS media paths and HTTPS-hosted images."""
+    """Allow Pages CMS media paths and HTTPS-hosted media."""
     value = str(value or "").strip()
     if value.startswith("/media/") and ".." not in value and "\\" not in value:
         return clean(value.lstrip("/"))
     return safe_url(value, anchors=False)
+
+
+def safe_anchor(value, fallback):
+    """Return a stable, editable in-page anchor without allowing HTML injection."""
+    value = str(value or "").strip().lower()
+    if re.fullmatch(r"[a-z][a-z0-9-]{0,48}", value):
+        return value
+    return fallback
+
+
+def section_dom_id(section, kind, index=0):
+    fallback = SECTION_IDS.get(kind, f"section-{index}")
+    if kind in {"story", "video"}:
+        return safe_anchor(section.get("anchor"), fallback)
+    return fallback
+
+
+def video_embed_url(value, autoplay=False, muted=True, loop=False, controls=True):
+    """Convert common YouTube/Bilibili links to privacy-conscious embed URLs."""
+    value = str(value or "").strip()
+    parsed = urlparse(value)
+    if parsed.scheme != "https" or not parsed.netloc:
+        return ""
+    host = parsed.netloc.lower().split(":", 1)[0]
+    video_id = ""
+    if host in {"youtu.be", "www.youtu.be"}:
+        video_id = parsed.path.strip("/").split("/")[0]
+    elif host in {"youtube.com", "www.youtube.com", "m.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"}:
+        if parsed.path == "/watch":
+            video_id = parse_qs(parsed.query).get("v", [""])[0]
+        elif parsed.path.startswith(("/embed/", "/shorts/")):
+            video_id = parsed.path.strip("/").split("/")[1]
+    if re.fullmatch(r"[A-Za-z0-9_-]{6,20}", video_id):
+        params = [f"autoplay={1 if autoplay else 0}", f"mute={1 if muted else 0}", f"controls={1 if controls else 0}", "rel=0"]
+        if loop:
+            params.extend(("loop=1", f"playlist={video_id}"))
+        return f"https://www.youtube-nocookie.com/embed/{video_id}?{'&'.join(params)}"
+    if host in {"bilibili.com", "www.bilibili.com", "m.bilibili.com"}:
+        match = re.search(r"/(BV[A-Za-z0-9]+)", parsed.path, re.IGNORECASE)
+        if match:
+            bvid = match.group(1)
+            return f"https://player.bilibili.com/player.html?bvid={bvid}&autoplay={1 if autoplay else 0}&high_quality=1"
+    if host == "player.bilibili.com" and parsed.path == "/player.html":
+        return safe_url(value, anchors=False)
+    return ""
+
+
+def render_video_media(data, class_name="video-media", eager=False):
+    """Render uploaded/direct video, a supported embed, a poster, or a placeholder."""
+    video_file = safe_media(data.get("video_file"))
+    video_url_raw = str(data.get("video_url") or "").strip()
+    video_url = safe_url(video_url_raw, anchors=False)
+    poster = safe_media(data.get("poster") or data.get("cover_image"))
+    title = clean(data.get("title") or data.get("heading") or "视频作品")
+    autoplay = truthy(data.get("autoplay"), False)
+    muted = truthy(data.get("muted"), True)
+    loop = truthy(data.get("loop"), False)
+    controls = truthy(data.get("controls"), True)
+    embed = video_embed_url(video_url_raw, autoplay=autoplay, muted=muted, loop=loop, controls=controls)
+    if embed:
+        allow = "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
+        return (
+            f'<div class="{class_name} is-embed"><iframe src="{clean(embed)}" title="{title}" '
+            f'loading="{"eager" if eager else "lazy"}" allow="{allow}" allowfullscreen></iframe></div>'
+        )
+    source = video_file or video_url
+    if source:
+        attrs = ["playsinline", f'aria-label="{title}"']
+        if poster:
+            attrs.append(f'poster="{poster}"')
+        if controls:
+            attrs.append("controls")
+        if autoplay:
+            attrs.append("autoplay")
+        if muted or autoplay:
+            attrs.append("muted")
+        if loop:
+            attrs.append("loop")
+        if not eager:
+            attrs.append('preload="metadata"')
+        return f'<div class="{class_name}"><video src="{source}" {" ".join(attrs)}></video></div>'
+    if poster:
+        return f'<div class="{class_name} is-poster"><img src="{poster}" alt="{title}" loading="{"eager" if eager else "lazy"}"></div>'
+    return (
+        f'<div class="{class_name} video-placeholder" aria-label="{title}">'
+        '<span class="video-play" aria-hidden="true">▶</span><strong>VIDEO SLOT</strong><small>在后台上传视频或粘贴链接</small></div>'
+    )
 
 
 def load_json(path, fallback):
@@ -131,14 +220,18 @@ def render_button(label, target, kind="primary"):
 
 def render_hero(section, identity, ui_labels):
     layout = choice(section.get("layout"), {"split", "full", "minimal"}, "split")
+    media_type = choice(section.get("media_type"), {"image", "video"}, "image")
     image = safe_media(section.get("image"))
     focal = choice(section.get("image_position"), {"center", "top", "bottom", "left", "right"}, "center")
-    visual = (
-        f'<img src="{image}" alt="{clean(section.get("image_alt"))}" style="object-position:{focal}" fetchpriority="high">'
-        if image else
-        '<div class="hero-placeholder" aria-label="等待上传首屏照片"><span class="orbit orbit-one"></span>'
-        '<span class="orbit orbit-two"></span><strong>Q / H</strong><small>FRAME · STUDY · CREATE</small></div>'
-    )
+    if media_type == "video" and (section.get("video_file") or section.get("video_url") or section.get("poster")):
+        visual = render_video_media(section, class_name="hero-video", eager=True)
+    else:
+        visual = (
+            f'<img src="{image}" alt="{clean(section.get("image_alt"))}" style="object-position:{focal}" fetchpriority="high">'
+            if image else
+            '<div class="hero-placeholder" aria-label="等待上传首屏照片"><span class="orbit orbit-one"></span>'
+            '<span class="orbit orbit-two"></span><strong>Q / H</strong><small>FRAME · STUDY · CREATE</small></div>'
+        )
     specialties = identity.get("specialties", []) if isinstance(identity, dict) else []
     chips = "".join(f'<span>{clean(item)}</span>' for item in specialties if item)
     buttons = render_button(section.get("primary_label"), section.get("primary_target"), "primary")
@@ -193,6 +286,8 @@ def render_photography(section, photos, index, ui_labels):
         category = clean(item.get("category") or "未分类")
         year = clean(item.get("year"))
         description = clean(item.get("description"))
+        details = " · ".join(str(value) for value in (item.get("location"), item.get("credit")) if value)
+        detail_html = f'<small class="shot-detail">{clean(details)}</small>' if details else ""
         if image:
             media = f'<img src="{image}" alt="{clean(item.get("alt") or item.get("title"))}" loading="lazy" style="object-position:{focal}">'
         else:
@@ -200,12 +295,19 @@ def render_photography(section, photos, index, ui_labels):
                 f'<div class="shot-placeholder placeholder-{(card_index - 1) % 6 + 1}">'
                 f'<span>{clean(ui_labels.get("image_slot") or "IMAGE SLOT")}</span><strong>{clean(ui_labels.get("image_placeholder") or "上传你的作品")}</strong></div>'
             )
+        media_link = safe_url(item.get("link"), anchors=False)
+        if media_link:
+            media_label = clean(item.get("link_label") or f'查看{item.get("title") or "作品"}')
+            media = (
+                f'<a href="{media_link}" target="_blank" rel="noopener noreferrer" '
+                f'aria-label="{media_label}">{media}</a>'
+            )
         cards.append(
             f'<article class="shot shot-{size}" data-category="{category}" data-reveal>'
             f'<div class="shot-media">{media}</div>'
             '<div class="shot-caption">'
             f'<div><span>{category}{" · " + year if year else ""}</span><h3>{title}</h3></div>'
-            f'<p>{description}</p>'
+            f'<p>{description}{detail_html}</p>'
             '</div></article>'
         )
     empty = '<p class="empty-state">后台添加摄影作品后，它们会自动出现在这里。</p>'
@@ -216,6 +318,66 @@ def render_photography(section, photos, index, ui_labels):
         f'<div class="photo-grid photo-grid-{layout}">{"".join(cards) if cards else empty}</div>'
         f'{render_button(section.get("link_label"), section.get("link_url"), "text")}'
         '</div></section>'
+    )
+
+
+def render_videos(section, videos, index):
+    layout = choice(section.get("layout"), {"featured", "grid", "filmstrip"}, "featured")
+    limit = clamp_number(section.get("limit"), 1, 20, 6)
+    selected = videos[:limit]
+    cards = []
+    for card_index, item in enumerate(selected, 1):
+        size = choice(item.get("size"), {"standard", "wide", "feature"}, "standard")
+        media = render_video_media(item, class_name="video-card-media")
+        meta = " · ".join(str(value) for value in (item.get("category"), item.get("year"), item.get("duration")) if value)
+        link = render_button(item.get("link_label"), item.get("link"), "text")
+        cards.append(
+            f'<article class="video-card video-card-{size}" data-reveal>'
+            f'{media}<div class="video-card-copy"><span>{clean(meta or f"FILM {card_index:02d}")}</span>'
+            f'<h3>{clean(item.get("title"))}</h3><p>{clean_multiline(item.get("description"))}</p>{link}</div></article>'
+        )
+    empty = '<p class="empty-state">在后台“视频作品”中添加内容，再打开本板块的显示开关。</p>'
+    section_id = section_dom_id(section, "video", index)
+    return (
+        f'<section id="{section_id}" class="section section-{clean(section.get("tone") or "white")}">'
+        f'<div class="shell">{render_section_head(section, index)}'
+        f'<div class="video-grid video-grid-{layout}">{"".join(cards) if cards else empty}</div>'
+        f'{render_button(section.get("link_label"), section.get("link_url"), "text")}</div></section>'
+    )
+
+
+def render_story(section, index):
+    layout = choice(section.get("layout"), {"media-left", "media-right", "full"}, "media-left")
+    media_type = choice(section.get("media_type"), {"image", "video", "none"}, "image")
+    section_id = section_dom_id(section, "story", index)
+    if media_type == "video":
+        media = render_video_media(section, class_name="story-visual")
+    elif media_type == "image":
+        image = safe_media(section.get("image"))
+        focal = choice(section.get("image_position"), {"center", "top", "bottom", "left", "right"}, "center")
+        media = (
+            f'<div class="story-visual"><img src="{image}" alt="{clean(section.get("image_alt") or section.get("heading"))}" '
+            f'loading="lazy" style="object-position:{focal}"></div>'
+            if image else '<div class="story-visual story-placeholder"><span>STORY / IMAGE</span></div>'
+        )
+    else:
+        media = ""
+    number = clean(section.get("number") or f"{index:02d}")
+    copy = (
+        '<div class="story-copy" data-reveal>'
+        f'<div class="section-mark"><span>{number}</span><span>{clean(section.get("eyebrow"))}</span></div>'
+        f'<h2>{clean_multiline(section.get("heading"))}</h2>'
+        f'<p class="story-lead">{clean_multiline(section.get("description"))}</p>'
+        f'<div class="story-body">{clean_multiline(section.get("body"))}</div>'
+        f'<blockquote>{clean_multiline(section.get("quote"))}</blockquote>'
+        f'<div class="hero-actions">{render_button(section.get("primary_label"), section.get("primary_target"), "primary")}'
+        f'{render_button(section.get("secondary_label"), section.get("secondary_target"), "ghost")}</div></div>'
+    )
+    media_html = f'<div data-reveal>{media}</div>' if media else ""
+    no_media_class = " story-no-media" if not media else ""
+    return (
+        f'<section id="{section_id}" class="section section-{clean(section.get("tone") or "white")}">'
+        f'<div class="shell story story-{layout}{no_media_class}">{media_html}{copy}</div></section>'
     )
 
 
@@ -385,6 +547,8 @@ def render_sections(site, collections):
             output.append(render_marquee(section))
         elif kind == "photography":
             output.append(render_photography(section, collections["photos"], visible_index, ui_labels))
+        elif kind == "video":
+            output.append(render_videos(section, collections["videos"], visible_index))
         elif kind == "stats":
             output.append(render_stats(section, visible_index))
         elif kind == "teaching":
@@ -393,6 +557,8 @@ def render_sections(site, collections):
             output.append(render_research(section, collections["research"], visible_index))
         elif kind == "python":
             output.append(render_python(section, collections["apps"], visible_index, ui_labels))
+        elif kind == "story":
+            output.append(render_story(section, visible_index))
         elif kind == "about":
             output.append(render_about(section, visible_index))
         elif kind == "contact":
@@ -405,12 +571,12 @@ def render_navigation(site):
     sections = site.get("sections", []) if isinstance(site.get("sections"), list) else []
     ui_labels = site.get("ui_labels", {}) if isinstance(site.get("ui_labels"), dict) else {}
     links = []
-    for section in sections:
+    for section_index, section in enumerate(sections, 1):
         if not isinstance(section, dict) or not truthy(section.get("visible"), True) or not truthy(section.get("show_in_nav"), False):
             continue
         kind = section.get("type")
         if kind in SECTION_IDS and section.get("nav_label"):
-            links.append(f'<a href="#{SECTION_IDS[kind]}">{clean(section.get("nav_label"))}</a>')
+            links.append(f'<a href="#{section_dom_id(section, kind, section_index)}">{clean(section.get("nav_label"))}</a>')
     return (
         '<header class="site-header"><div class="nav-shell">'
         f'<a class="brand" href="#home"><span>{clean(identity.get("logo_text") or "QZH")}</span>'
@@ -434,7 +600,7 @@ def render_footer(site):
 
 def build():
     site = load_json(ROOT / "content" / "site.json", {})
-    collections = {name: load_items(name) for name in ("photos", "courses", "research", "apps")}
+    collections = {name: load_items(name) for name in ("photos", "videos", "courses", "research", "apps")}
     identity = site.get("identity", {}) if isinstance(site.get("identity"), dict) else {}
     seo = site.get("seo", {}) if isinstance(site.get("seo"), dict) else {}
     appearance = site.get("appearance", {}) if isinstance(site.get("appearance"), dict) else {}
@@ -442,9 +608,14 @@ def build():
     accent, accent_soft, accent_deep = ACCENTS[accent_name]
     corners = {"sharp": "2px", "subtle": "14px", "soft": "26px"}.get(appearance.get("corners"), "14px")
     spacing = {"compact": "88px", "balanced": "112px", "airy": "144px"}.get(appearance.get("spacing"), "112px")
+    shell_max = {"studio": "1240px", "wide": "1440px", "cinema": "1680px"}.get(appearance.get("width"), "1440px")
+    header_style = choice(appearance.get("header_style"), {"glass", "solid"}, "glass")
     body_class = "motion-on" if truthy(appearance.get("motion"), True) else "motion-off"
+    body_class += f" header-{header_style}"
     title = clean(seo.get("title") or f'{identity.get("name_zh", "钱子恒")} {identity.get("name_en", "Henry Qian")}｜个人网站')
     description = clean(seo.get("description") or "钱子恒的摄影、教学、学术研究与 Python 项目作品集。")
+    share_image = safe_media(seo.get("share_image"))
+    share_image_meta = f'\n  <meta property="og:image" content="{share_image}">' if share_image else ""
     html = f'''<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -453,10 +624,10 @@ def build():
   <meta name="theme-color" content="#ffffff">
   <meta name="description" content="{description}">
   <meta property="og:title" content="{title}">
-  <meta property="og:description" content="{description}">
+  <meta property="og:description" content="{description}">{share_image_meta}
   <title>{title}</title>
   <link rel="stylesheet" href="assets/styles.css">
-  <style>:root{{--accent:{accent};--accent-soft:{accent_soft};--accent-deep:{accent_deep};--radius:{corners};--section-space:{spacing}}}</style>
+  <style>:root{{--accent:{accent};--accent-soft:{accent_soft};--accent-deep:{accent_deep};--radius:{corners};--section-space:{spacing};--shell-max:{shell_max}}}</style>
 </head>
 <body class="{body_class}">
   <a class="skip-link" href="#main">跳到主要内容</a>
