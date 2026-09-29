@@ -1,3 +1,214 @@
 {
-  "intro": "你好"
+  "identity": {
+    "name_zh": "钱子恒",
+    "name_en": "HENRY QIAN",
+    "logo_text": "QZH",
+    "email": "",
+    "location": "NANTONG · CHINA",
+    "specialties": [
+      "PHOTOGRAPHY",
+      "EDUCATION",
+      "FINANCE RESEARCH",
+      "PYTHON"
+    ]
+  },
+  "seo": {
+    "title": "钱子恒 Henry Qian｜摄影 · 教学 · 研究 · Python",
+    "description": "钱子恒的个人作品集：摄影创作、课程教学、金融研究与 Python 项目。"
+  },
+  "appearance": {
+    "accent": "electric-blue",
+    "corners": "subtle",
+    "spacing": "airy",
+    "motion": true
+  },
+  "ui_labels": {
+    "menu": "菜单",
+    "scroll": "SCROLL ↓",
+    "filter_all": "全部",
+    "image_slot": "IMAGE SLOT",
+    "image_placeholder": "上传你的作品",
+    "coming_soon": "COMING SOON"
+  },
+  "socials": [
+    {
+      "label": "小红书",
+      "url": ""
+    },
+    {
+      "label": "抖音",
+      "url": ""
+    },
+    {
+      "label": "GitHub",
+      "url": ""
+    }
+  ],
+  "footer": {
+    "tagline": "用影像观察，用知识连接，用代码实践。",
+    "copyright": "HENRY QIAN"
+  },
+  "sections": [
+    {
+      "type": "hero",
+      "visible": true,
+      "show_in_nav": true,
+      "nav_label": "首页",
+      "kicker": "HENRY QIAN · PERSONAL PORTFOLIO 2026",
+      "heading": "在影像与知识之间，\n持续创作。",
+      "description": "你好，我是钱子恒。这里汇集我的摄影创作、课程教学、金融研究与 Python 实践。不同的工作，共同指向一件事：认真观察，并把复杂的问题讲清楚。",
+      "primary_label": "浏览摄影作品",
+      "primary_target": "#photography",
+      "secondary_label": "认识我",
+      "secondary_target": "#about",
+      "image": "",
+      "image_alt": "钱子恒个人网站首屏视觉",
+      "image_position": "center",
+      "visual_note": "FRAME / STUDY / CREATE",
+      "layout": "split"
+    },
+    {
+      "type": "marquee",
+      "visible": true,
+      "show_in_nav": false,
+      "items": [
+        "PHOTOGRAPHY",
+        "TEACHING",
+        "FINANCE RESEARCH",
+        "PYTHON LAB",
+        "VISUAL STORYTELLING",
+        "INFINITE CURIOSITY"
+      ]
+    },
+    {
+      "type": "photography",
+      "visible": true,
+      "show_in_nav": true,
+      "nav_label": "摄影",
+      "number": "01",
+      "eyebrow": "SELECTED WORK",
+      "heading": "摄影不是记录，\n是重新组织观看。",
+      "description": "人物、校园、城市与商业影像。每一次按下快门，都是对光线、情绪和人与环境关系的重新判断。",
+      "layout": "editorial",
+      "tone": "white",
+      "limit": 9,
+      "link_label": "",
+      "link_url": ""
+    },
+    {
+      "type": "stats",
+      "visible": true,
+      "show_in_nav": false,
+      "number": "02",
+      "eyebrow": "NOW / HIGHLIGHTS",
+      "heading": "持续积累，\n让作品自己说话。",
+      "description": "这些数字不是终点，只是我在摄影、教学和研究道路上的阶段性坐标。",
+      "tone": "white",
+      "items": [
+        {
+          "value": "6万+",
+          "label": "社交平台关注者",
+          "note": "小红书与抖音内容持续更新"
+        },
+        {
+          "value": "350万+",
+          "label": "累计点赞",
+          "note": "影像、探店与短视频内容"
+        },
+        {
+          "value": "5篇",
+          "label": "高质量论文",
+          "note": "聚焦 IPO 定价与金融数据"
+        },
+        {
+          "value": "01",
+          "label": "持续迭代的个人网站",
+          "note": "把创作、教学、研究与代码放在一起"
+        }
+      ]
+    },
+    {
+      "type": "teaching",
+      "visible": true,
+      "show_in_nav": true,
+      "nav_label": "教学",
+      "number": "03",
+      "eyebrow": "TEACHING",
+      "heading": "让复杂知识，\n变成可练习的步骤。",
+      "description": "面向财经类学生，把真实任务、金融案例、数据工具与课堂表达连接起来。",
+      "layout": "spotlight",
+      "tone": "white",
+      "limit": 6
+    },
+    {
+      "type": "research",
+      "visible": true,
+      "show_in_nav": true,
+      "nav_label": "学术",
+      "number": "04",
+      "eyebrow": "RESEARCH",
+      "heading": "用数据解释市场，\n也保留对人的关注。",
+      "description": "关注中国资本市场定价、投资者行为、信息不对称，以及金融数据方法在真实问题中的应用。",
+      "layout": "timeline",
+      "tone": "white",
+      "limit": 8
+    },
+    {
+      "type": "python",
+      "visible": true,
+      "show_in_nav": true,
+      "nav_label": "Python",
+      "number": "05",
+      "eyebrow": "PYTHON LAB",
+      "heading": "把研究想法，\n做成可以使用的工具。",
+      "description": "从课堂小练习到金融计算器，用简洁代码验证思路，也让学生能真正动手。",
+      "layout": "lab",
+      "tone": "white",
+      "limit": 6
+    },
+    {
+      "type": "about",
+      "visible": true,
+      "show_in_nav": true,
+      "nav_label": "关于",
+      "number": "06",
+      "eyebrow": "ABOUT ME",
+      "heading": "研究者、教师，\n也是影像创作者。",
+      "description": "看似不同的身份，让我不断在理性分析与感性表达之间来回切换。",
+      "tone": "white",
+      "image": "",
+      "image_alt": "钱子恒个人照片",
+      "quote": "研究给我结构，摄影给我直觉，教学让我把两者讲明白。",
+      "body": "钱子恒，金融学博士研究生，江苏商贸职业学院教师，同时从事人物摄影与短视频创作。我的研究聚焦 IPO 定价效率、投资者情绪与金融数据；教学中关注 Python、金融科技与会计基础；镜头之外，我也在探索如何用数字工具提高创作和教学效率。",
+      "facts": [
+        {
+          "label": "研究方向",
+          "value": "IPO 定价 · 投资者情绪 · 金融数据"
+        },
+        {
+          "label": "教学方向",
+          "value": "金融大数据 · Python · 基础会计"
+        },
+        {
+          "label": "创作方向",
+          "value": "人物摄影 · 校园纪实 · 短视频"
+        },
+        {
+          "label": "当前所在地",
+          "value": "江苏 · 南通"
+        }
+      ]
+    },
+    {
+      "type": "contact",
+      "visible": true,
+      "show_in_nav": true,
+      "nav_label": "联系",
+      "number": "07",
+      "eyebrow": "CONTACT",
+      "heading": "一起拍摄、研究，\n或者做点新东西。",
+      "description": "欢迎交流摄影合作、课程共建、学术研究与 Python 项目。请先在后台“网站全局设置”中填写邮箱和社交主页链接。",
+      "tone": "white"
+    }
+  ]
 }
