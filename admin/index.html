@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f6f6f3">
+  <title>Henry 网站管理后台</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div id="login-view" class="login-view" hidden>
+    <section class="login-card">
+      <div class="login-mark">QZH</div>
+      <p class="eyebrow">PRIVATE STUDIO</p>
+      <h1>网站管理后台</h1>
+      <p>登录后可以修改网站文字、排版、照片、视频、课程、论文与 Python 项目。</p>
+      <form id="login-form">
+        <label>后台密码<input id="password" type="password" autocomplete="current-password" required></label>
+        <button class="button button-dark" type="submit">进入后台</button>
+      </form>
+      <p id="login-message" class="form-message" aria-live="polite"></p>
+    </section>
+  </div>
+
+  <div id="setup-view" class="login-view" hidden>
+    <section class="login-card setup-card">
+      <div class="login-mark">!</div>
+      <p class="eyebrow">ONE-TIME SETUP</p>
+      <h1>后台程序已经安装</h1>
+      <p>还差服务器密钥配置。请在 Netlify 添加 <code>GITHUB_TOKEN</code>、<code>ADMIN_PASSWORD</code> 和 <code>ADMIN_SESSION_SECRET</code>，然后重新部署。</p>
+      <a class="button button-dark" href="https://app.netlify.com" target="_blank" rel="noopener noreferrer">打开 Netlify</a>
+    </section>
+  </div>
+
+  <div id="admin-view" class="admin-shell" hidden>
+    <aside class="sidebar">
+      <a class="admin-brand" href="/" target="_blank" rel="noopener noreferrer"><span>QZH</span><strong>HENRY<br>STUDIO</strong></a>
+      <nav id="admin-nav" aria-label="后台栏目"></nav>
+      <div class="sidebar-foot">
+        <button id="logout-button" class="text-button" type="button">退出登录</button>
+        <small id="repo-label"></small>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">CONTENT CONTROL</p>
+          <h1 id="page-title">网站概览</h1>
+        </div>
+        <div class="topbar-actions">
+          <span id="save-state" class="save-state">已同步</span>
+          <a class="button button-light" href="/" target="_blank" rel="noopener noreferrer">查看网站 ↗</a>
+          <button id="save-button" class="button button-dark" type="button">保存并发布</button>
+        </div>
+      </header>
+      <section id="editor" class="editor" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="admin.js" defer></script>
+</body>
+</html>
