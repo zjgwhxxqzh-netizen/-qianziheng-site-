@@ -5,7 +5,7 @@
 
 [[redirects]]
   from = "/api/admin/*"
-  to = "/.netlify/functions/admin-api/:splat"
+  to = "/.netlify/functions/admin-api?action=:splat"
   status = 200
   force = true
 
