@@ -14,12 +14,15 @@
   },
   "seo": {
     "title": "钱子恒 Henry Qian｜摄影 · 教学 · 研究 · Python",
-    "description": "钱子恒的个人作品集：摄影创作、课程教学、金融研究与 Python 项目。"
+    "description": "钱子恒的个人作品集：摄影创作、课程教学、金融研究与 Python 项目。",
+    "share_image": ""
   },
   "appearance": {
     "accent": "electric-blue",
     "corners": "subtle",
     "spacing": "airy",
+    "width": "wide",
+    "header_style": "glass",
     "motion": true
   },
   "ui_labels": {
@@ -64,6 +67,14 @@
       "image": "",
       "image_alt": "钱子恒个人网站首屏视觉",
       "image_position": "center",
+      "media_type": "image",
+      "video_file": "",
+      "video_url": "",
+      "poster": "",
+      "autoplay": true,
+      "muted": true,
+      "loop": true,
+      "controls": false,
       "visual_note": "FRAME / STUDY / CREATE",
       "layout": "split"
     },
@@ -92,6 +103,22 @@
       "layout": "editorial",
       "tone": "white",
       "limit": 9,
+      "link_label": "",
+      "link_url": ""
+    },
+    {
+      "type": "video",
+      "visible": false,
+      "show_in_nav": true,
+      "nav_label": "视频",
+      "anchor": "video",
+      "number": "02",
+      "eyebrow": "MOTION WORK",
+      "heading": "让画面流动，\n也让故事发生。",
+      "description": "短片、课程片段与影像创作。你可以上传 MP4/WebM，也可以粘贴 YouTube 或哔哩哔哩链接。",
+      "layout": "featured",
+      "tone": "white",
+      "limit": 6,
       "link_label": "",
       "link_url": ""
     },
@@ -165,6 +192,36 @@
       "layout": "lab",
       "tone": "white",
       "limit": 6
+    },
+    {
+      "type": "story",
+      "visible": false,
+      "show_in_nav": false,
+      "nav_label": "介绍",
+      "anchor": "story",
+      "number": "06",
+      "eyebrow": "A SHORT STORY",
+      "heading": "这里可以放一段\n更自由的个人介绍。",
+      "description": "这是一个可重复使用的图文介绍模块，可以放在页面任意位置。",
+      "body": "你可以在后台修改标题、正文、引语、图片或视频，也可以改变左右排版和板块底色。",
+      "quote": "把你最想让访客记住的一句话放在这里。",
+      "media_type": "image",
+      "image": "",
+      "image_alt": "个人故事配图",
+      "image_position": "center",
+      "video_file": "",
+      "video_url": "",
+      "poster": "",
+      "autoplay": false,
+      "muted": true,
+      "loop": false,
+      "controls": true,
+      "layout": "media-left",
+      "tone": "mist",
+      "primary_label": "",
+      "primary_target": "",
+      "secondary_label": "",
+      "secondary_target": ""
     },
     {
       "type": "about",
