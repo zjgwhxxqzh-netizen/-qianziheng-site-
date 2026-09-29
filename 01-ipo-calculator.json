@@ -1,0 +1,1 @@
+{"title":"IPO 首日抑价率计算器","label":"INTERACTIVE / FINANCE","app_type":"calculator","symbol":"%","description":"输入发行价和首日收盘价，立即计算首日抑价率。适合课堂演示与概念练习，不构成任何投资建议。","tags":["IPO","FINANCE","INTERACTIVE"],"input_one_label":"发行价（元）","input_two_label":"首日收盘价（元）","action_label":"开始计算","result_label":"首日抑价率","link":"","link_label":"","order":1,"visible":true}
