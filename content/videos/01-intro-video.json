@@ -1,0 +1,19 @@
+{
+  "title": "示例：个人介绍视频",
+  "category": "个人介绍",
+  "year": "2026",
+  "duration": "00:45",
+  "description": "把这条示例改成你自己的视频，填写上传文件或外部链接，再把“在网页显示”打开。",
+  "video_file": "",
+  "video_url": "",
+  "poster": "",
+  "autoplay": false,
+  "muted": true,
+  "loop": false,
+  "controls": true,
+  "size": "feature",
+  "link": "",
+  "link_label": "",
+  "order": 1,
+  "visible": false
+}
